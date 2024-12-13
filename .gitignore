@@ -1,0 +1,18 @@
+# Compiled files
+*.pyc
+__pycache__/
+
+# PyInstaller build and dist folders
+build/
+dist/
+
+# PyInstaller spec file
+*.spec
+
+# Logs and temporary files
+*.log
+*.tmp
+
+# System files
+.DS_Store
+Thumbs.db

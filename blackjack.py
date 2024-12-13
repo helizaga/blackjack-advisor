@@ -149,25 +149,30 @@ def dealer_value(card):
 
 
 def recommend_action(player_cards, dealer_upcard):
-    """
-    Recommend the best action given the player's cards and the dealer's upcard.
-    Returns one of: H, S, D, P (Hit, Stand, Double, Split).
-    """
-    ranks = [c.upper() for c in player_cards]
     p_type = hand_type(player_cards)
     p_val = hand_value(player_cards)
     d_val = dealer_value(dealer_upcard)
 
+    # If the player has more than 2 cards, don't allow double down (D)
+    # Because double down is generally only allowed on the initial two-card hand.
+    more_than_two_cards = len(player_cards) > 2
+
+    ranks = [c.upper() for c in player_cards]
     # Special case: Pair of Aces always split
     if p_type == "pair" and ranks[0] == "A":
         return "P"
 
     key = (p_type, p_val, d_val)
     if key in basic_strategy:
-        return basic_strategy[key]
+        recommended = basic_strategy[key]
+        # If recommended is "D" (Double) but player already hit, revert to "H" (Hit)
+        if recommended == "D" and more_than_two_cards:
+            recommended = "H"
+        return recommended
 
-    # Fallback logic if no entry in strategy table
+    # Fallback logic if no entry in strategy table:
     if p_type == "hard":
+        # With more than 2 cards, no double, just hit or stand
         return "H" if p_val < 12 else "S"
     elif p_type == "soft":
         return "H" if p_val < 18 else "S"
