@@ -149,8 +149,13 @@ def dealer_value(card):
 
 
 def recommend_action(player_cards, dealer_upcard):
-    p_type = hand_type(player_cards)
     p_val = hand_value(player_cards)
+
+    # If player is over 21, they are busted, so no further action makes sense
+    if p_val > 21:
+        return "BUST"
+
+    p_type = hand_type(player_cards)
     d_val = dealer_value(dealer_upcard)
 
     # If the player has more than 2 cards, don't allow double down (D)
@@ -213,13 +218,17 @@ def recommend_bet(chip_balance, min_bet, max_bet, true_count):
     Capped at max_bet.
     """
     if true_count <= 0:
-        return min_bet
+        recommended = min_bet
     elif true_count == 1:
-        return min(2 * min_bet, max_bet)
+        recommended = min(2 * min_bet, max_bet)
     elif true_count == 2:
-        return min(4 * min_bet, max_bet)
+        recommended = min(4 * min_bet, max_bet)
     else:
-        return min(8 * min_bet, max_bet)
+        recommended = min(8 * min_bet, max_bet)
+
+    # Ensure recommended bet does not exceed chip balance
+    recommended = min(recommended, chip_balance)
+    return recommended
 
 
 def normalize_cards(input_str):
